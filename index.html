@@ -1,0 +1,566 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2487">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="zh-TW"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;小小畫曆師：傳承布農智慧&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://unpkg.com/react@18/umd/react.development.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://unpkg.com/babel-standalone@6/babel.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- html2canvas 用於將畫作轉存為圖片 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"&gt;&lt;/script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&amp;display=swap');</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Noto Sans TC', sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #f5efe6;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4c5b0' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");</p>
+<p class="p1"><span class="Apple-converted-space">            </span>overscroll-behavior: none; /* 防止 iOS 下拉重整 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>user-select: none; /* 防止選取文字影響操作 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.wood-texture {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #8b5e3c;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: inset 0 0 30px rgba(0,0,0,0.6);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 8px solid #5d4037;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 1rem;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.canvas-container {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>touch-action: none;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>cursor: crosshair;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.bunun-pattern {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: repeating-linear-gradient(</p>
+<p class="p1"><span class="Apple-converted-space">                </span>90deg,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>#1a1a1a 0px, #1a1a1a 10px,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>#ffffff 10px, #ffffff 14px,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>#b91c1c 14px, #b91c1c 24px,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>#ffffff 24px, #ffffff 28px</p>
+<p class="p1"><span class="Apple-converted-space">            </span>);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>height: 24px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 2px 4px rgba(0,0,0,0.2);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* Custom Scrollbar */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>::-webkit-scrollbar {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>height: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>::-webkit-scrollbar-track {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #f1f1f1;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 4px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>::-webkit-scrollbar-thumb {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #8d6e63;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 4px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="root"&gt;&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script type="text/babel"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const { useState, useRef, useEffect } = React;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 學生名單</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const STUDENT_LIST = [</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"01 蘇莛晏", "02 龔宸宏", "03 劉宗源", "04 邱宇翔", "05 周炳盛",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"06 朱丞凱", "07 陳宥安", "08 劉子賓", "09 楊晟宏", "10 陳宥凱",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"11 蘇凡鈞", "12 周郁翔", "13 馮士瑜", "14 陳義凱", "15 林家田",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"16 江宥葳", "17 江宥萱", "18 麥芷瑄", "19 林雨晴", "20 張心瑜",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"21 林姿均", "22 鍾允蓁", "23 李品妡", "24 黃若瑜", "25 簡子媛",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"26 林永晴", "27 郭品岑", "庭安老師"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- Icons ---</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const Icon = ({ size = 24, color = "currentColor", children, className, ...props }) =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{children}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const Pencil = (props) =&gt; &lt;Icon {...props}&gt;&lt;path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /&gt;&lt;path d="m15 5 4 4" /&gt;&lt;/Icon&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const Eraser = (props) =&gt; &lt;Icon {...props}&gt;&lt;path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21" /&gt;&lt;path d="M22 21H7" /&gt;&lt;path d="m5 11 9 9" /&gt;&lt;/Icon&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const RotateCcw = (props) =&gt; &lt;Icon {...props}&gt;&lt;path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /&gt;&lt;path d="M3 3v5h5" /&gt;&lt;/Icon&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const Save = (props) =&gt; &lt;Icon {...props}&gt;&lt;path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /&gt;&lt;polyline points="17 21 17 13 7 13 7 21" /&gt;&lt;polyline points="7 3 7 8 15 8" /&gt;&lt;/Icon&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const Info = (props) =&gt; &lt;Icon {...props}&gt;&lt;circle cx="12" cy="12" r="10" /&gt;&lt;path d="M12 16v-4" /&gt;&lt;path d="M12 8h.01" /&gt;&lt;/Icon&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const X = (props) =&gt; &lt;Icon {...props}&gt;&lt;path d="M18 6 6 18" /&gt;&lt;path d="m6 6 12 12" /&gt;&lt;/Icon&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const Download = (props) =&gt; &lt;Icon {...props}&gt;&lt;path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /&gt;&lt;polyline points="7 10 12 15 17 10" /&gt;&lt;line x1="12" y1="15" x2="12" y2="3" /&gt;&lt;/Icon&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const CheckCircle = (props) =&gt; &lt;Icon {...props}&gt;&lt;path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/&gt;&lt;polyline points="22 4 12 14.01 9 11.01"/&gt;&lt;/Icon&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const ImageDown = (props) =&gt; &lt;Icon {...props}&gt;&lt;path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/&gt;&lt;polyline points="7 10 12 15 17 10"/&gt;&lt;line x1="12" y1="15" x2="12" y2="3"/&gt;&lt;/Icon&gt;;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- Symbol Icons ---</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const SymbolIcon = ({ type, size = 40 }) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const commonProps = { width: size, height: size, viewBox: "0 0 40 40", fill: "none", stroke: "#5d4037", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round" };</p>
+<p class="p1"><span class="Apple-converted-space">            </span>switch(type) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>case 'day': return &lt;svg {...commonProps} fill="#5d4037"&gt;&lt;path d="M20 5 L35 35 H5 Z" /&gt;&lt;/svg&gt;;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>case 'boil': return &lt;svg {...commonProps}&gt;&lt;path d="M5 25 A15 15 0 0 1 35 25" /&gt;&lt;line x1="5" y1="25" x2="35" y2="25" /&gt;&lt;line x1="20" y1="25" x2="20" y2="35" /&gt;&lt;/svg&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>case 'prohibit': return &lt;svg {...commonProps}&gt;&lt;rect x="5" y="10" width="30" height="20" /&gt;&lt;/svg&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>case 'taro': return &lt;svg {...commonProps}&gt;&lt;circle cx="12" cy="12" r="4" /&gt;&lt;circle cx="28" cy="12" r="4" /&gt;&lt;circle cx="12" cy="28" r="4" /&gt;&lt;circle cx="28" cy="28" r="4" /&gt;&lt;/svg&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>case 'hunt': return &lt;svg {...commonProps}&gt;&lt;path d="M5 35 L20 10 L35 35" /&gt;&lt;/svg&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>case 'hoe': return &lt;svg {...commonProps}&gt;&lt;path d="M25 5 H10 V25" strokeWidth="4"/&gt;&lt;/svg&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>case 'clearing': return &lt;svg {...commonProps}&gt;&lt;rect x="8" y="8" width="24" height="24" /&gt;&lt;circle cx="15" cy="15" r="1" fill="currentColor"/&gt;&lt;circle cx="25" cy="15" r="1" fill="currentColor"/&gt;&lt;circle cx="15" cy="25" r="1" fill="currentColor"/&gt;&lt;circle cx="25" cy="25" r="1" fill="currentColor"/&gt;&lt;/svg&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>case 'count': return &lt;svg {...commonProps}&gt;&lt;circle cx="20" cy="20" r="12" /&gt;&lt;path d="M20 20 L20 8" /&gt;&lt;path d="M20 20 L28 12" /&gt;&lt;path d="M20 20 L32 20" /&gt;&lt;path d="M20 20 L12 28" /&gt;&lt;path d="M20 20 L8 20" /&gt;&lt;/svg&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>case 'pig': return &lt;svg {...commonProps}&gt;&lt;path d="M10 25c0-5 3-10 10-10 8 0 12 5 12 10H10z" /&gt;&lt;circle cx="15" cy="20" r="1.5" fill="currentColor"/&gt;&lt;/svg&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>case 'rifle': return &lt;svg {...commonProps}&gt;&lt;path d="M5 30 L15 30 L15 15 L35 5" /&gt;&lt;/svg&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>case 'field': return &lt;svg {...commonProps}&gt;&lt;rect x="5" y="10" width="30" height="20" /&gt;&lt;line x1="15" y1="10" x2="15" y2="30" /&gt;&lt;line x1="25" y1="10" x2="25" y2="30" /&gt;&lt;/svg&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>case 'tree': return &lt;svg {...commonProps}&gt;&lt;path d="M20 35 V5" /&gt;&lt;path d="M20 25 L10 15" /&gt;&lt;path d="M20 20 L30 10" /&gt;&lt;path d="M20 15 L15 10" /&gt;&lt;path d="M20 10 L25 5" /&gt;&lt;/svg&gt;;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>default: return null;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const BUNUN_SYMBOLS = [</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ name: "刻痕 (一日)", meaning: "三角形刻痕，代表過去了一天。", type: "day" },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ name: "開墾 (鋤頭)", meaning: "鋤頭形狀，表示開始整地、耕作。", type: "hoe" },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ name: "煮栗", meaning: "半圓形代表平底鍋，正在煮栗米釀酒。", type: "boil" },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ name: "祭祀 (豬)", meaning: "畫出豬的形狀，表示殺豬祭祀。", type: "pig" },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ name: "出獵", meaning: "山峰的形狀，表示上山打獵。", type: "hunt" },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ name: "放置芋頭", meaning: "四個圓圈，表示把芋頭放在平籠中。", type: "taro" },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ name: "數栗", meaning: "圓形內有放射線，表示清點收成。", type: "count" },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ name: "禁止柴薪", meaning: "長方形，表示此日不可砍柴。", type: "prohibit" },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ name: "田園", meaning: "有格子的長方形，代表田地。", type: "field" },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ name: "獵鹿耳", meaning: "獵槍形狀，表示射獵鹿的耳朵。", type: "rifle" },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ name: "開墾園地", meaning: "方框內有點，表示開墾新的田地。", type: "clearing" },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ name: "榛樹", meaning: "樹枝形狀，表示與植物相關的活動。", type: "tree" },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const ANCESTRAL_SEQUENCE = [</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ days: 3, event: "開墾祭", icons: ['hoe', 'clearing'] },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ days: 4, event: "播栗祭", icons: ['count', 'hunt', 'hoe'] },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ days: 3, event: "栗收穫祭", icons: ['prohibit', 'count'] },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ days: 3, event: "除草祭", icons: ['hoe', 'tree', 'tree'] },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ days: 4, event: "打耳祭", icons: ['prohibit', 'hunt', 'rifle'] },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ days: 4, event: "豐收祭", icons: ['pig', 'pig', 'taro'] },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ days: 3, event: "首飾祭", icons: ['taro', 'taro', 'taro'] },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ days: 3, event: "取穗祭", icons: ['tree', 'hunt'] },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- Components ---</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const AncestralBoard = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="bg-white rounded-3xl shadow-xl border-4 border-[#5d4037] mb-8 overflow-hidden"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className="bg-[#f5efe6] p-4 flex justify-between items-center border-b border-[#d7ccc8]"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="flex items-center gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="w-10 h-10 bg-[#5d4037] rounded-full flex items-center justify-center text-white"&gt;&lt;Icon size={24}&gt;&lt;path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/&gt;&lt;/Icon&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div&gt;&lt;h3 className="text-xl font-black text-[#5d4037]"&gt;祖先的智慧：原始畫曆&lt;/h3&gt;&lt;p className="text-xs text-[#8d6e63]"&gt;向右滑動，看看以前的人怎麼畫&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className="p-4 md:p-6 bg-[#fffbf5] relative"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                         </span>&lt;div className="absolute top-0 left-0 w-4 h-full bg-gradient-to-r from-[#fffbf5] to-transparent z-10 pointer-events-none"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                         </span>&lt;div className="absolute top-0 right-0 w-4 h-full bg-gradient-to-l from-[#fffbf5] to-transparent z-10 pointer-events-none"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="overflow-x-auto overflow-y-hidden custom-scrollbar pb-14" style={{ touchAction: 'pan-x' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="flex items-end min-w-max px-4 pt-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{ANCESTRAL_SEQUENCE.map((period, pIdx) =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div key={pIdx} className="flex flex-col items-start relative mr-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div className="absolute -bottom-10 left-0 w-full text-center text-xs md:text-sm font-bold text-[#5d4037] border-t border-[#d7ccc8] pt-1 mt-2 whitespace-nowrap"&gt;{period.event}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div className="flex"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>{Array.from({ length: period.days }).map((_, dIdx) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>const iconType = period.icons[dIdx] || null;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div key={dIdx} className="flex flex-col items-center justify-end w-10 md:w-14"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>&lt;div className="h-16 flex items-end mb-1"&gt;{iconType &amp;&amp; &lt;SymbolIcon type={iconType} size={32} /&gt;}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>&lt;div className="w-4 h-4 md:w-5 md:h-5 bg-black transform rotate-45 mb-2"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>&lt;div className="w-full h-1 bg-black absolute bottom-4 left-0 right-0 -z-10"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>);</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>})}</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div className="w-[1px] h-12 bg-gray-400 absolute bottom-0 right-0 translate-x-1/2"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const DrawingCanvas = ({ currentDay, onClose, onSave, existingImage, existingDesc }) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const canvasRef = useRef(null);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [isDrawing, setIsDrawing] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [tool, setTool] = useState('pencil');<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [description, setDescription] = useState(existingDesc || '');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>useEffect(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const canvas = canvasRef.current;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const ctx = canvas.getContext('2d');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const dpr = window.devicePixelRatio || 1;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const rect = canvas.getBoundingClientRect();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>canvas.width = rect.width * dpr;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>canvas.height = rect.height * dpr;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ctx.fillStyle = '#e8dcc5';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ctx.fillRect(0, 0, canvas.width, canvas.height);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (existingImage) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const img = new Image();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>img.onload = () =&gt; ctx.drawImage(img, 0, 0, canvas.width, canvas.height);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>img.src = existingImage;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}, []);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const getPos = (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const canvas = canvasRef.current;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const rect = canvas.getBoundingClientRect();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const clientX = e.clientX || (e.touches &amp;&amp; e.touches[0] ? e.touches[0].clientX : 0);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const clientY = e.clientY || (e.touches &amp;&amp; e.touches[0] ? e.touches[0].clientY : 0);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const scaleX = canvas.width / rect.width;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const scaleY = canvas.height / rect.height;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const startDrawing = (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const { x, y } = getPos(e);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const ctx = canvasRef.current.getContext('2d');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ctx.beginPath();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ctx.moveTo(x, y);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setIsDrawing(true);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const draw = (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!isDrawing) return;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const { x, y } = getPos(e);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const ctx = canvasRef.current.getContext('2d');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const dpr = window.devicePixelRatio || 1;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const baseLineWidth = tool === 'eraser' ? 20 : 6;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ctx.lineWidth = baseLineWidth * dpr;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ctx.lineCap = 'round';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ctx.lineJoin = 'round';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ctx.strokeStyle = tool === 'eraser' ? '#e8dcc5' : '#4a3728';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ctx.lineTo(x, y);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ctx.stroke();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const handleSave = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const canvas = canvasRef.current;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>onSave(currentDay.id, canvas.toDataURL(), description);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>onClose();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const clearCanvas = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const canvas = canvasRef.current;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const ctx = canvas.getContext('2d');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ctx.fillStyle = '#e8dcc5';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ctx.fillRect(0, 0, canvas.width, canvas.height);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-2 md:p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className="bg-[#fdfbf7] rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[95vh] border-4 border-[#5d4037]"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="bg-[#5d4037] p-5 flex justify-between items-center text-white relative overflow-hidden shrink-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                             </span>&lt;div className="absolute top-0 left-0 w-full h-4 bg-red-700 opacity-50"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;h3 className="text-2xl md:text-3xl font-bold pl-2 relative z-10"&gt;刻畫：{currentDay.label}&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button onClick={onClose} className="bg-[#3e2723] hover:bg-red-800 p-2 rounded-full transition relative z-10"&gt;&lt;X size={32} /&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar relative bg-white"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="p-3 md:p-4 bg-gray-100 flex flex-col items-center justify-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p className="text-[#5d4037] mb-2 font-bold text-sm md:text-base flex items-center gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;span className="bg-[#8b5e3c] text-white px-2 py-1 rounded text-xs"&gt;提示&lt;/span&gt; 在木板上畫出一個符號代表今天</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="relative w-full h-[300px] md:h-[350px] shadow-inner border-[6px] border-[#a1887f] rounded-lg bg-[#e8dcc5] overflow-hidden cursor-crosshair shrink-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;canvas ref={canvasRef} className="w-full h-full canvas-container touch-none" onMouseDown={startDrawing} onMouseMove={draw} onMouseUp={() =&gt; setIsDrawing(false)} onMouseLeave={() =&gt; setIsDrawing(false)} onTouchStart={startDrawing} onTouchMove={draw} onTouchEnd={() =&gt; setIsDrawing(false)} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="p-3 md:p-4 space-y-4 pb-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="flex justify-center gap-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;button onClick={() =&gt; setTool('pencil')} className={`p-4 rounded-xl flex flex-col items-center transition w-24 ${tool === 'pencil' ? 'bg-[#5d4037] text-white shadow-lg scale-105' : 'bg-gray-100 text-gray-600 border'}`}&gt;&lt;Pencil size={28} /&gt;&lt;span className="text-sm font-bold mt-1"&gt;刻刀&lt;/span&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;button onClick={() =&gt; setTool('eraser')} className={`p-4 rounded-xl flex flex-col items-center transition w-24 ${tool === 'eraser' ? 'bg-[#5d4037] text-white shadow-lg scale-105' : 'bg-gray-100 text-gray-600 border'}`}&gt;&lt;Eraser size={28} /&gt;&lt;span className="text-sm font-bold mt-1"&gt;磨平&lt;/span&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;button onClick={clearCanvas} className="p-4 rounded-xl flex flex-col items-center bg-white text-red-600 border-2 border-red-100 hover:bg-red-50 w-24"&gt;&lt;RotateCcw size={28} /&gt;&lt;span className="text-sm font-bold mt-1"&gt;重拿一塊&lt;/span&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="bg-yellow-50 p-4 rounded-xl border border-yellow-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;label className="block text-base md:text-lg font-bold text-[#5d4037] mb-2 flex items-center gap-2"&gt;&lt;span className="w-2 h-8 bg-[#b91c1c] rounded-full inline-block"&gt;&lt;/span&gt; 為所畫之事命名：&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;input type="text" value={description} onChange={(e) =&gt; setDescription(e.target.value)} placeholder="例如：練習大隊接力、幫忙做家事..." className="w-full p-4 text-lg border-2 border-[#d7ccc8] rounded-xl focus:ring-4 focus:ring-[#8b5e3c] focus:border-[#5d4037] outline-none" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="p-3 border-t bg-[#f5efe6] flex justify-between items-center shrink-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button onClick={onClose} className="px-6 py-3 text-gray-600 font-bold text-lg hover:bg-gray-200 rounded-xl"&gt;取消&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button onClick={handleSave} className="px-8 py-3 bg-[#b91c1c] text-white rounded-xl hover:bg-[#991b1b] flex items-center gap-3 font-bold text-lg shadow-lg transform active:scale-95 transition"&gt;&lt;Save size={24} /&gt; 完成刻畫&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- Export Modal Component (Capture &amp; Save Image) ---</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const ExportModal = ({ studentName, days, onClose }) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const targetRef = useRef(null);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [generating, setGenerating] = useState(false);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const handleDownload = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!targetRef.current) return;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setGenerating(true);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Use html2canvas to screenshot the result card</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const canvas = await html2canvas(targetRef.current, {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>scale: 2, // Higher quality</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>useCORS: true,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>backgroundColor: '#fff9f0'</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const link = document.createElement('a');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>link.download = `${studentName || '我的'}_布農畫曆.png`;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>link.href = canvas.toDataURL();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>link.click();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setGenerating(false);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>console.error("Screenshot failed:", error);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>alert("下載失敗，請嘗試手動截圖！");</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setGenerating(false);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const completionCount = days.filter(d =&gt; d.image).length;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4" onClick={onClose}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className="bg-white rounded-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]" onClick={e =&gt; e.stopPropagation()}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="bg-[#3e2723] p-4 flex justify-between items-center text-white"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;h3 className="text-xl font-bold flex items-center gap-2"&gt;&lt;ImageDown size={24}/&gt; 作業完成卡&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button onClick={onClose} className="hover:bg-white/20 p-1 rounded-full"&gt;&lt;X size={24}/&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="p-4 overflow-y-auto bg-gray-100 flex-1 flex flex-col items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p className="text-gray-600 mb-4 text-sm text-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>請點擊下方按鈕下載圖片，然後傳給老師檢查。&lt;br/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>(如果下載失敗，也可以直接截圖喔！)</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/p&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>{/* This is the visual area we will capture */}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div ref={targetRef} className="bg-[#fff9f0] p-6 rounded-xl border-4 border-[#5d4037] shadow-lg w-full max-w-lg relative"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="absolute top-0 left-0 w-full h-4 bg-[#b91c1c] opacity-80"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="mt-4 text-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;h2 className="text-2xl font-black text-[#3e2723] mb-1"&gt;小小畫曆師結業證書&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div className="text-[#8d6e63] text-sm font-bold mb-4"&gt;Bunun Calendar Project&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div className="flex justify-center items-center gap-4 mb-6 bg-[#f5efe6] p-3 rounded-lg border border-[#d7ccc8]"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div className="text-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div className="text-xs text-gray-500"&gt;創作者&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div className="text-xl font-bold text-[#3e2723]"&gt;{studentName || "未填名"}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div className="w-px h-10 bg-[#d7ccc8]"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div className="text-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div className="text-xs text-gray-500"&gt;完成度&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div className="text-xl font-bold text-[#b91c1c]"&gt;{completionCount} / 5&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div className="grid grid-cols-5 gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{days.map((day) =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div key={day.id} className="flex flex-col items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div className="w-full aspect-[3/4] bg-[#e8dcc5] border-2 border-[#8d6e63] rounded flex items-center justify-center overflow-hidden relative mb-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>{day.image ? &lt;img src={day.image} className="w-full h-full object-contain" /&gt; : &lt;span className="text-[#a1887f] text-xs"&gt;空白&lt;/span&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;span className="text-xs font-bold text-[#5d4037]"&gt;{day.label}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div className="mt-4 pt-4 border-t border-dashed border-[#d7ccc8] text-left"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;p className="text-xs text-[#8d6e63] font-bold mb-1"&gt;畫曆解碼：&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{days.map(d =&gt; d.desc &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div key={d.id} className="flex text-xs text-[#5d4037] mb-0.5"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;span className="font-bold mr-1"&gt;{d.label}:&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;span className="truncate"&gt;{d.desc}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>onClick={handleDownload}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>disabled={generating}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>className={`mt-6 bg-[#b91c1c] text-white px-8 py-3 rounded-full font-bold text-lg shadow-lg flex items-center gap-2 hover:bg-[#991b1b] transition transform active:scale-95 ${generating ? 'opacity-50' : ''}`}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{generating ? "製作中..." : &lt;React.Fragment&gt;&lt;ImageDown size={20}/&gt; 下載圖片&lt;/React.Fragment&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- Main App ---</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const App = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const STORAGE_KEY = 'bunun_calendar_v3_local';<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [days, setDays] = useState(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const saved = localStorage.getItem(STORAGE_KEY);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return saved ? JSON.parse(saved) : [</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 'mon', label: '週一', image: null, desc: '' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 'tue', label: '週二', image: null, desc: '' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 'wed', label: '週三', image: null, desc: '' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 'thu', label: '週四', image: null, desc: '' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 'fri', label: '週五', image: null, desc: '' },</p>
+<p class="p1"><span class="Apple-converted-space">                </span>];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [studentName, setStudentName] = useState(localStorage.getItem('student_name') || '');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [activeDay, setActiveDay] = useState(null);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [showReference, setShowReference] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [showExport, setShowExport] = useState(false);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>useEffect(() =&gt; { localStorage.setItem(STORAGE_KEY, JSON.stringify(days)); }, [days]);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>useEffect(() =&gt; { localStorage.setItem('student_name', studentName); }, [studentName]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const handleSaveDay = (id, img, desc) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setDays(days.map(d =&gt; d.id === id ? { ...d, image: img, desc: desc } : d));</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const resetAll = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if(confirm('確定要清空所有畫曆重新開始嗎？')) setDays(days.map(d =&gt; ({ ...d, image: null, desc: '' })));</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const handleFinish = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!studentName) return alert("請先選擇你的姓名喔！");</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setShowExport(true);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="min-h-screen pb-20 bg-[#f5efe6] select-none"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{/* Header */}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;header className="bg-[#3e2723] text-[#f5efe6] shadow-xl relative overflow-hidden"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="bunun-pattern"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="max-w-7xl mx-auto px-4 py-6 md:py-8 relative z-10"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="flex flex-col lg:flex-row justify-between items-center gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="text-center lg:text-left"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;h1 className="text-3xl md:text-5xl font-black tracking-wider mb-2 flex items-center justify-center lg:justify-start gap-4 text-[#f5efe6]"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;Icon size={48} className="text-[#b91c1c]"&gt;&lt;path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /&gt;&lt;path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /&gt;&lt;/Icon&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>小小畫曆師</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;p className="text-[#d7ccc8] text-lg font-medium"&gt;記錄你的每週大事 · 傳承布農板曆智慧&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="bg-[#5d4037] p-3 rounded-xl flex flex-col md:flex-row items-center gap-3 border border-[#8d6e63] shadow-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div className="flex items-center gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;label className="font-bold text-[#d7ccc8] whitespace-nowrap"&gt;我是：&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;select value={studentName} onChange={(e) =&gt; setStudentName(e.target.value)} className="bg-[#3e2723] text-white border border-[#8d6e63] rounded px-3 py-2 w-40 text-center cursor-pointer appearance-none"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;option value="" disabled&gt;請選擇姓名&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>{STUDENT_LIST.map(n =&gt; &lt;option key={n} value={n}&gt;{n}&lt;/option&gt;)}</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;button onClick={handleFinish} className="flex items-center gap-2 px-5 py-2 rounded-lg font-bold transition shadow-md whitespace-nowrap bg-[#b91c1c] text-white hover:bg-[#991b1b]"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;React.Fragment&gt;&lt;CheckCircle size={20}/&gt; 繳交作業&lt;/React.Fragment&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="flex gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;button onClick={() =&gt; setShowReference(true)} className="bg-[#f5efe6] text-[#5d4037] px-4 py-3 rounded-full font-bold text-lg flex items-center gap-2 shadow-lg hover:bg-white transition active:scale-95"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;Info size={24} /&gt;&lt;span className="hidden md:inline"&gt;符號圖鑑&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;button onClick={resetAll} className="bg-[#5d4037] border border-[#8d6e63] text-white px-4 py-3 rounded-full font-bold flex items-center gap-2 hover:bg-[#4e342e]"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;RotateCcw size={20} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/header&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;main className="max-w-7xl mx-auto px-4 py-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;AncestralBoard /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="bg-white p-6 md:p-8 rounded-3xl shadow-lg mb-8 border-l-8 border-[#b91c1c] relative overflow-hidden"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="absolute right-0 top-0 opacity-10 transform translate-x-1/4 -translate-y-1/4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;svg width="200" height="200" viewBox="0 0 100 100" fill="#5d4037"&gt;&lt;path d="M50 0 L100 100 H0 Z" /&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;h2 className="text-2xl font-bold text-[#5d4037] mb-3"&gt;👋 嗨！小小畫曆師&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p className="text-gray-700 text-lg leading-relaxed"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>上面是布農族祖先的畫曆。現在換你來挑戰，幫自己規劃下週的生活。完成後記得點右上角的&lt;b&gt;「繳交作業」&lt;/b&gt;，把你的畫曆存下來傳給老師喔！</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="relative"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="wood-texture p-6 md:p-10 overflow-x-auto relative mb-12 shadow-2xl"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{[...Array(4)].map((_, i) =&gt; &lt;div key={i} className={`absolute w-6 h-6 rounded-full bg-[#271c19] shadow-inner border border-[#4e342e] ${i===0?'top-4 left-4':i===1?'top-4 right-4':i===2?'bottom-4 left-4':'bottom-4 right-4'}`}&gt;&lt;/div&gt;)}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="min-w-[750px] mx-auto relative py-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div className="absolute top-1/2 left-10 right-10 h-3 bg-[#3e2723] rounded-full opacity-60 transform -translate-y-1/2 z-0"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div className="flex justify-around relative z-10 px-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{days.map(day =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div key={day.id} className="flex flex-col items-center group relative"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div className="w-8 h-8 bg-[#3e2723] transform rotate-45 mb-6 shadow-lg border-2 border-[#8d6e63] flex items-center justify-center z-20"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div className="w-2 h-2 bg-[#d7ccc8] rounded-full"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div onClick={() =&gt; setActiveDay(day)} className={`w-32 h-44 bg-[#e8dcc5] rounded-xl border-[5px] border-[#8d6e63] shadow-xl cursor-pointer transition-all duration-300 transform hover:-translate-y-4 hover:rotate-1 hover:shadow-2xl hover:border-[#b91c1c] flex flex-col items-center justify-center relative overflow-hidden ${day.image ? 'bg-opacity-100' : 'bg-opacity-90'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div className="absolute top-0 inset-x-0 bg-[#5d4037] text-[#f5efe6] py-2 text-center font-bold text-lg tracking-widest"&gt;{day.label}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>{day.image ? &lt;img src={day.image} alt={day.label} className="w-full h-full object-contain p-3 mt-6" /&gt; : &lt;div className="text-[#a1887f] flex flex-col items-center mt-6 animate-pulse"&gt;&lt;Pencil size={32} className="mb-2 opacity-50" /&gt;&lt;span className="text-sm font-bold"&gt;點擊刻畫&lt;/span&gt;&lt;/div&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div className="mt-4 w-36 text-center h-16 flex items-start justify-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>{day.desc ? &lt;div className="bg-white px-3 py-2 rounded-lg text-sm text-[#5d4037] font-bold shadow-md border border-gray-200 w-full line-clamp-2 leading-tight"&gt;{day.desc}&lt;/div&gt; : &lt;span className="text-[#5d4037]/40 font-bold text-sm"&gt;--&lt;/span&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="bg-white rounded-3xl shadow-lg p-6 md:p-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="flex items-center gap-3 mb-6 border-b-2 border-[#f5efe6] pb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span className="bg-[#b91c1c] text-white p-2 rounded-lg"&gt;&lt;Save size={24}/&gt;&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;h3 className="text-2xl font-black text-[#5d4037]"&gt;我的畫曆解碼&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span className="text-sm text-gray-500 ml-auto hidden md:block"&gt;系統會自動保留你的作品在平板上喔！&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="grid grid-cols-1 md:grid-cols-2 gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{days.filter(d =&gt; d.desc || d.image).length === 0 ? &lt;div className="col-span-2 text-center py-12 bg-[#f5efe6] rounded-xl border-2 border-dashed border-[#d7ccc8]"&gt;&lt;p className="text-[#8d6e63] text-xl font-bold mb-2"&gt;還是一片空白的木板...&lt;/p&gt;&lt;/div&gt; : days.filter(d =&gt; d.desc || d.image).map(day =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div key={day.id} className="flex items-center gap-4 p-4 bg-[#fbf8f3] rounded-xl border border-[#ece0d1] shadow-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div className="w-20 h-20 bg-[#e8dcc5] rounded-lg border-2 border-[#d7ccc8] flex-shrink-0 overflow-hidden shadow-inner"&gt;{day.image ? &lt;img src={day.image} className="w-full h-full object-contain" /&gt; : &lt;span className="flex items-center justify-center h-full text-gray-300"&gt;無&lt;/span&gt;}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div className="flex-1"&gt;&lt;div className="flex justify-between items-center mb-1"&gt;&lt;span className="font-black text-lg text-[#5d4037]"&gt;{day.label}&lt;/span&gt;&lt;span className="text-xs text-[#b91c1c] bg-[#fee2e2] px-2 py-0.5 rounded-full font-bold"&gt;重要事項&lt;/span&gt;&lt;/div&gt;&lt;p className="text-gray-800 font-medium text-lg leading-snug"&gt;{day.desc || "尚未填寫意義"}&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/main&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{activeDay &amp;&amp; &lt;DrawingCanvas currentDay={activeDay} existingImage={activeDay.image} existingDesc={activeDay.desc} onClose={() =&gt; setActiveDay(null)} onSave={handleSaveDay} /&gt;}</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{showReference &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4" onClick={() =&gt; setShowReference(false)}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="bg-[#fdfbf7] rounded-2xl max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col shadow-2xl" onClick={e =&gt; e.stopPropagation()}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="bg-[#3e2723] p-4 flex justify-between items-center shrink-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;h3 className="text-2xl font-bold text-white flex items-center gap-3"&gt;&lt;Info size={28} className="text-[#e8dcc5]" /&gt; 布農族畫曆符號圖鑑&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;button onClick={() =&gt; setShowReference(false)} className="text-white hover:bg-white/20 p-2 rounded-full transition"&gt;&lt;X size={28}/&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="p-6 overflow-y-auto custom-scrollbar"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{BUNUN_SYMBOLS.map((item, idx) =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div key={idx} className="border-2 border-[#d7ccc8] rounded-xl p-4 flex flex-col items-center text-center bg-white hover:border-[#8b5e3c] transition shadow-sm hover:shadow-md group"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div className="w-20 h-20 mb-3 flex items-center justify-center bg-[#f5efe6] rounded-full group-hover:bg-[#e8dcc5] transition"&gt;&lt;SymbolIcon type={item.type} /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div className="font-black text-lg text-[#5d4037] mb-1"&gt;{item.name}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div className="text-sm text-gray-600 leading-snug"&gt;{item.meaning}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="p-4 border-t bg-gray-50 text-center shrink-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;button onClick={() =&gt; setShowReference(false)} className="bg-[#5d4037] text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#3e2723] shadow-lg"&gt;我學會了，開始創作！&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>)}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{showExport &amp;&amp; &lt;ExportModal studentName={studentName} days={days} onClose={() =&gt; setShowExport(false)} /&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const root = ReactDOM.createRoot(document.getElementById('root'));</p>
+<p class="p1"><span class="Apple-converted-space">        </span>root.render(&lt;App /&gt;);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
