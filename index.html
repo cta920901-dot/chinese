@@ -1,1 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>小小畫曆師：傳承布農智慧</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <!-- html2canvas 用於將畫作轉存為圖片 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f5efe6;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4c5b0' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            overscroll-behavior: none; /* 防止 iOS 下拉重整 */
+            user-select: none; /* 防止選取文字影響操作 */
+        }
+        
+        .wood-texture {
+            background-color: #8b5e3c;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
+            border: 8px solid #5d4037;
+            border-radius: 1rem;
+        }
+
+        .canvas-container {
+            touch-action: none; 
+            cursor: crosshair;
+        }
+        
+        .bunun-pattern {
+            background: repeating-linear-gradient(
+                90deg,
+                #1a1a1a 0px, #1a1a1a 10px,
+                #ffffff 10px, #ffffff 14px,
+                #b91c1c 14px, #b91c1c 24px,
+                #ffffff 24px, #ffffff 28px
+            );
+            height: 24px;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8d6e63; 
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+
+        // 學生名單
+        const STUDENT_LIST = [
+            "01 蘇莛晏", "02 龔宸宏", "03 劉宗源", "04 邱宇翔", "05 周炳盛",
+            "06 朱丞凱", "07 陳宥安", "08 劉子賓", "09 楊晟宏", "10 陳宥凱",
+            "11 蘇凡鈞", "12 周郁翔", "13 馮士瑜", "14 陳義凱", "15 林家田",
+            "16 江宥葳", "17 江宥萱", "18 麥芷瑄", "19 林雨晴", "20 張心瑜",
+            "21 林姿均", "22 鍾允蓁", "23 李品妡", "24 黃若瑜", "25 簡子媛",
+            "26 林永晴", "27 郭品岑", "庭安老師"
+        ];
+
+        // --- Icons ---
+        const Icon = ({ size = 24, color = "currentColor", children, className, ...props }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+                {children}
+            </svg>
+        );
+
+        const Pencil = (props) => <Icon {...props}><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></Icon>;
+        const Eraser = (props) => <Icon {...props}><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21" /><path d="M22 21H7" /><path d="m5 11 9 9" /></Icon>;
+        const RotateCcw = (props) => <Icon {...props}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></Icon>;
+        const Save = (props) => <Icon {...props}><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" /></Icon>;
+        const Info = (props) => <Icon {...props}><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></Icon>;
+        const X = (props) => <Icon {...props}><path d="M18 6 6 18" /><path d="m6 6 12 12" /></Icon>;
+        const Download = (props) => <Icon {...props}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></Icon>;
+        const CheckCircle = (props) => <Icon {...props}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></Icon>;
+        const ImageDown = (props) => <Icon {...props}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></Icon>;
+
+        // --- Symbol Icons ---
+        const SymbolIcon = ({ type, size = 40 }) => {
+            const commonProps = { width: size, height: size, viewBox: "0 0 40 40", fill: "none", stroke: "#5d4037", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round" };
+            switch(type) {
+                case 'day': return <svg {...commonProps} fill="#5d4037"><path d="M20 5 L35 35 H5 Z" /></svg>; 
+                case 'boil': return <svg {...commonProps}><path d="M5 25 A15 15 0 0 1 35 25" /><line x1="5" y1="25" x2="35" y2="25" /><line x1="20" y1="25" x2="20" y2="35" /></svg>;
+                case 'prohibit': return <svg {...commonProps}><rect x="5" y="10" width="30" height="20" /></svg>;
+                case 'taro': return <svg {...commonProps}><circle cx="12" cy="12" r="4" /><circle cx="28" cy="12" r="4" /><circle cx="12" cy="28" r="4" /><circle cx="28" cy="28" r="4" /></svg>;
+                case 'hunt': return <svg {...commonProps}><path d="M5 35 L20 10 L35 35" /></svg>;
+                case 'hoe': return <svg {...commonProps}><path d="M25 5 H10 V25" strokeWidth="4"/></svg>;
+                case 'clearing': return <svg {...commonProps}><rect x="8" y="8" width="24" height="24" /><circle cx="15" cy="15" r="1" fill="currentColor"/><circle cx="25" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="25" r="1" fill="currentColor"/><circle cx="25" cy="25" r="1" fill="currentColor"/></svg>;
+                case 'count': return <svg {...commonProps}><circle cx="20" cy="20" r="12" /><path d="M20 20 L20 8" /><path d="M20 20 L28 12" /><path d="M20 20 L32 20" /><path d="M20 20 L12 28" /><path d="M20 20 L8 20" /></svg>;
+                case 'pig': return <svg {...commonProps}><path d="M10 25c0-5 3-10 10-10 8 0 12 5 12 10H10z" /><circle cx="15" cy="20" r="1.5" fill="currentColor"/></svg>;
+                case 'rifle': return <svg {...commonProps}><path d="M5 30 L15 30 L15 15 L35 5" /></svg>;
+                case 'field': return <svg {...commonProps}><rect x="5" y="10" width="30" height="20" /><line x1="15" y1="10" x2="15" y2="30" /><line x1="25" y1="10" x2="25" y2="30" /></svg>;
+                case 'tree': return <svg {...commonProps}><path d="M20 35 V5" /><path d="M20 25 L10 15" /><path d="M20 20 L30 10" /><path d="M20 15 L15 10" /><path d="M20 10 L25 5" /></svg>;
+                default: return null;
+            }
+        };
+
+        const BUNUN_SYMBOLS = [
+            { name: "刻痕 (一日)", meaning: "三角形刻痕，代表過去了一天。", type: "day" },
+            { name: "開墾 (鋤頭)", meaning: "鋤頭形狀，表示開始整地、耕作。", type: "hoe" },
+            { name: "煮栗", meaning: "半圓形代表平底鍋，正在煮栗米釀酒。", type: "boil" },
+            { name: "祭祀 (豬)", meaning: "畫出豬的形狀，表示殺豬祭祀。", type: "pig" },
+            { name: "出獵", meaning: "山峰的形狀，表示上山打獵。", type: "hunt" },
+            { name: "放置芋頭", meaning: "四個圓圈，表示把芋頭放在平籠中。", type: "taro" },
+            { name: "數栗", meaning: "圓形內有放射線，表示清點收成。", type: "count" },
+            { name: "禁止柴薪", meaning: "長方形，表示此日不可砍柴。", type: "prohibit" },
+            { name: "田園", meaning: "有格子的長方形，代表田地。", type: "field" },
+            { name: "獵鹿耳", meaning: "獵槍形狀，表示射獵鹿的耳朵。", type: "rifle" },
+            { name: "開墾園地", meaning: "方框內有點，表示開墾新的田地。", type: "clearing" },
+            { name: "榛樹", meaning: "樹枝形狀，表示與植物相關的活動。", type: "tree" },
+        ];
+
+        const ANCESTRAL_SEQUENCE = [
+            { days: 3, event: "開墾祭", icons: ['hoe', 'clearing'] },
+            { days: 4, event: "播栗祭", icons: ['count', 'hunt', 'hoe'] },
+            { days: 3, event: "栗收穫祭", icons: ['prohibit', 'count'] },
+            { days: 3, event: "除草祭", icons: ['hoe', 'tree', 'tree'] },
+            { days: 4, event: "打耳祭", icons: ['prohibit', 'hunt', 'rifle'] },
+            { days: 4, event: "豐收祭", icons: ['pig', 'pig', 'taro'] },
+            { days: 3, event: "首飾祭", icons: ['taro', 'taro', 'taro'] },
+            { days: 3, event: "取穗祭", icons: ['tree', 'hunt'] },
+        ];
+
+        // --- Components ---
+
+        const AncestralBoard = () => {
+            return (
+                <div className="bg-white rounded-3xl shadow-xl border-4 border-[#5d4037] mb-8 overflow-hidden">
+                    <div className="bg-[#f5efe6] p-4 flex justify-between items-center border-b border-[#d7ccc8]">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-[#5d4037] rounded-full flex items-center justify-center text-white"><Icon size={24}><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></Icon></div>
+                            <div><h3 className="text-xl font-black text-[#5d4037]">祖先的智慧：原始畫曆</h3><p className="text-xs text-[#8d6e63]">向右滑動，看看以前的人怎麼畫</p></div>
+                        </div>
+                    </div>
+                    <div className="p-4 md:p-6 bg-[#fffbf5] relative">
+                         <div className="absolute top-0 left-0 w-4 h-full bg-gradient-to-r from-[#fffbf5] to-transparent z-10 pointer-events-none"></div>
+                         <div className="absolute top-0 right-0 w-4 h-full bg-gradient-to-l from-[#fffbf5] to-transparent z-10 pointer-events-none"></div>
+                        <div className="overflow-x-auto overflow-y-hidden custom-scrollbar pb-14" style={{ touchAction: 'pan-x' }}>
+                            <div className="flex items-end min-w-max px-4 pt-8">
+                                {ANCESTRAL_SEQUENCE.map((period, pIdx) => (
+                                    <div key={pIdx} className="flex flex-col items-start relative mr-1">
+                                        <div className="absolute -bottom-10 left-0 w-full text-center text-xs md:text-sm font-bold text-[#5d4037] border-t border-[#d7ccc8] pt-1 mt-2 whitespace-nowrap">{period.event}</div>
+                                        <div className="flex">
+                                            {Array.from({ length: period.days }).map((_, dIdx) => {
+                                                const iconType = period.icons[dIdx] || null;
+                                                return (
+                                                    <div key={dIdx} className="flex flex-col items-center justify-end w-10 md:w-14">
+                                                        <div className="h-16 flex items-end mb-1">{iconType && <SymbolIcon type={iconType} size={32} />}</div>
+                                                        <div className="w-4 h-4 md:w-5 md:h-5 bg-black transform rotate-45 mb-2"></div>
+                                                        <div className="w-full h-1 bg-black absolute bottom-4 left-0 right-0 -z-10"></div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                        <div className="w-[1px] h-12 bg-gray-400 absolute bottom-0 right-0 translate-x-1/2"></div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const DrawingCanvas = ({ currentDay, onClose, onSave, existingImage, existingDesc }) => {
+            const canvasRef = useRef(null);
+            const [isDrawing, setIsDrawing] = useState(false);
+            const [tool, setTool] = useState('pencil'); 
+            const [description, setDescription] = useState(existingDesc || '');
+            
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                const dpr = window.devicePixelRatio || 1;
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                ctx.fillStyle = '#e8dcc5';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                if (existingImage) {
+                    const img = new Image();
+                    img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    img.src = existingImage;
+                }
+            }, []);
+
+            const getPos = (e) => {
+                const canvas = canvasRef.current;
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+                const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+            };
+
+            const startDrawing = (e) => {
+                const { x, y } = getPos(e);
+                const ctx = canvasRef.current.getContext('2d');
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                setIsDrawing(true);
+            };
+
+            const draw = (e) => {
+                if (!isDrawing) return;
+                const { x, y } = getPos(e);
+                const ctx = canvasRef.current.getContext('2d');
+                const dpr = window.devicePixelRatio || 1;
+                const baseLineWidth = tool === 'eraser' ? 20 : 6;
+                ctx.lineWidth = baseLineWidth * dpr;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.strokeStyle = tool === 'eraser' ? '#e8dcc5' : '#4a3728';
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            };
+
+            const handleSave = () => {
+                const canvas = canvasRef.current;
+                onSave(currentDay.id, canvas.toDataURL(), description);
+                onClose();
+            };
+
+            const clearCanvas = () => {
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#e8dcc5';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-2 md:p-4">
+                    <div className="bg-[#fdfbf7] rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[95vh] border-4 border-[#5d4037]">
+                        <div className="bg-[#5d4037] p-5 flex justify-between items-center text-white relative overflow-hidden shrink-0">
+                             <div className="absolute top-0 left-0 w-full h-4 bg-red-700 opacity-50"></div>
+                            <h3 className="text-2xl md:text-3xl font-bold pl-2 relative z-10">刻畫：{currentDay.label}</h3>
+                            <button onClick={onClose} className="bg-[#3e2723] hover:bg-red-800 p-2 rounded-full transition relative z-10"><X size={32} /></button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar relative bg-white">
+                            <div className="p-3 md:p-4 bg-gray-100 flex flex-col items-center justify-center">
+                                <p className="text-[#5d4037] mb-2 font-bold text-sm md:text-base flex items-center gap-2">
+                                    <span className="bg-[#8b5e3c] text-white px-2 py-1 rounded text-xs">提示</span> 在木板上畫出一個符號代表今天
+                                </p>
+                                <div className="relative w-full h-[300px] md:h-[350px] shadow-inner border-[6px] border-[#a1887f] rounded-lg bg-[#e8dcc5] overflow-hidden cursor-crosshair shrink-0">
+                                    <canvas ref={canvasRef} className="w-full h-full canvas-container touch-none" onMouseDown={startDrawing} onMouseMove={draw} onMouseUp={() => setIsDrawing(false)} onMouseLeave={() => setIsDrawing(false)} onTouchStart={startDrawing} onTouchMove={draw} onTouchEnd={() => setIsDrawing(false)} />
+                                </div>
+                            </div>
+                            <div className="p-3 md:p-4 space-y-4 pb-8">
+                                <div className="flex justify-center gap-6">
+                                    <button onClick={() => setTool('pencil')} className={`p-4 rounded-xl flex flex-col items-center transition w-24 ${tool === 'pencil' ? 'bg-[#5d4037] text-white shadow-lg scale-105' : 'bg-gray-100 text-gray-600 border'}`}><Pencil size={28} /><span className="text-sm font-bold mt-1">刻刀</span></button>
+                                    <button onClick={() => setTool('eraser')} className={`p-4 rounded-xl flex flex-col items-center transition w-24 ${tool === 'eraser' ? 'bg-[#5d4037] text-white shadow-lg scale-105' : 'bg-gray-100 text-gray-600 border'}`}><Eraser size={28} /><span className="text-sm font-bold mt-1">磨平</span></button>
+                                    <button onClick={clearCanvas} className="p-4 rounded-xl flex flex-col items-center bg-white text-red-600 border-2 border-red-100 hover:bg-red-50 w-24"><RotateCcw size={28} /><span className="text-sm font-bold mt-1">重拿一塊</span></button>
+                                </div>
+                                <div className="bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+                                    <label className="block text-base md:text-lg font-bold text-[#5d4037] mb-2 flex items-center gap-2"><span className="w-2 h-8 bg-[#b91c1c] rounded-full inline-block"></span> 為所畫之事命名：</label>
+                                    <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="例如：練習大隊接力、幫忙做家事..." className="w-full p-4 text-lg border-2 border-[#d7ccc8] rounded-xl focus:ring-4 focus:ring-[#8b5e3c] focus:border-[#5d4037] outline-none" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-3 border-t bg-[#f5efe6] flex justify-between items-center shrink-0">
+                            <button onClick={onClose} className="px-6 py-3 text-gray-600 font-bold text-lg hover:bg-gray-200 rounded-xl">取消</button>
+                            <button onClick={handleSave} className="px-8 py-3 bg-[#b91c1c] text-white rounded-xl hover:bg-[#991b1b] flex items-center gap-3 font-bold text-lg shadow-lg transform active:scale-95 transition"><Save size={24} /> 完成刻畫</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Export Modal Component (Capture & Save Image) ---
+        const ExportModal = ({ studentName, days, onClose }) => {
+            const targetRef = useRef(null);
+            const [generating, setGenerating] = useState(false);
+
+            const handleDownload = async () => {
+                if (!targetRef.current) return;
+                setGenerating(true);
+                try {
+                    // Use html2canvas to screenshot the result card
+                    const canvas = await html2canvas(targetRef.current, {
+                        scale: 2, // Higher quality
+                        useCORS: true,
+                        backgroundColor: '#fff9f0'
+                    });
+                    const link = document.createElement('a');
+                    link.download = `${studentName || '我的'}_布農畫曆.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    setGenerating(false);
+                } catch (error) {
+                    console.error("Screenshot failed:", error);
+                    alert("下載失敗，請嘗試手動截圖！");
+                    setGenerating(false);
+                }
+            };
+
+            const completionCount = days.filter(d => d.image).length;
+
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4" onClick={onClose}>
+                    <div className="bg-white rounded-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
+                        <div className="bg-[#3e2723] p-4 flex justify-between items-center text-white">
+                            <h3 className="text-xl font-bold flex items-center gap-2"><ImageDown size={24}/> 作業完成卡</h3>
+                            <button onClick={onClose} className="hover:bg-white/20 p-1 rounded-full"><X size={24}/></button>
+                        </div>
+
+                        <div className="p-4 overflow-y-auto bg-gray-100 flex-1 flex flex-col items-center">
+                            <p className="text-gray-600 mb-4 text-sm text-center">
+                                請點擊下方按鈕下載圖片，然後傳給老師檢查。<br/>
+                                (如果下載失敗，也可以直接截圖喔！)
+                            </p>
+
+                            {/* This is the visual area we will capture */}
+                            <div ref={targetRef} className="bg-[#fff9f0] p-6 rounded-xl border-4 border-[#5d4037] shadow-lg w-full max-w-lg relative">
+                                <div className="absolute top-0 left-0 w-full h-4 bg-[#b91c1c] opacity-80"></div>
+                                <div className="mt-4 text-center">
+                                    <h2 className="text-2xl font-black text-[#3e2723] mb-1">小小畫曆師結業證書</h2>
+                                    <div className="text-[#8d6e63] text-sm font-bold mb-4">Bunun Calendar Project</div>
+                                    
+                                    <div className="flex justify-center items-center gap-4 mb-6 bg-[#f5efe6] p-3 rounded-lg border border-[#d7ccc8]">
+                                        <div className="text-center">
+                                            <div className="text-xs text-gray-500">創作者</div>
+                                            <div className="text-xl font-bold text-[#3e2723]">{studentName || "未填名"}</div>
+                                        </div>
+                                        <div className="w-px h-10 bg-[#d7ccc8]"></div>
+                                        <div className="text-center">
+                                            <div className="text-xs text-gray-500">完成度</div>
+                                            <div className="text-xl font-bold text-[#b91c1c]">{completionCount} / 5</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-5 gap-2">
+                                        {days.map((day) => (
+                                            <div key={day.id} className="flex flex-col items-center">
+                                                <div className="w-full aspect-[3/4] bg-[#e8dcc5] border-2 border-[#8d6e63] rounded flex items-center justify-center overflow-hidden relative mb-1">
+                                                    {day.image ? <img src={day.image} className="w-full h-full object-contain" /> : <span className="text-[#a1887f] text-xs">空白</span>}
+                                                </div>
+                                                <span className="text-xs font-bold text-[#5d4037]">{day.label}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    
+                                    <div className="mt-4 pt-4 border-t border-dashed border-[#d7ccc8] text-left">
+                                        <p className="text-xs text-[#8d6e63] font-bold mb-1">畫曆解碼：</p>
+                                        {days.map(d => d.desc && (
+                                            <div key={d.id} className="flex text-xs text-[#5d4037] mb-0.5">
+                                                <span className="font-bold mr-1">{d.label}:</span>
+                                                <span className="truncate">{d.desc}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button 
+                                onClick={handleDownload}
+                                disabled={generating}
+                                className={`mt-6 bg-[#b91c1c] text-white px-8 py-3 rounded-full font-bold text-lg shadow-lg flex items-center gap-2 hover:bg-[#991b1b] transition transform active:scale-95 ${generating ? 'opacity-50' : ''}`}
+                            >
+                                {generating ? "製作中..." : <React.Fragment><ImageDown size={20}/> 下載圖片</React.Fragment>}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Main App ---
+        const App = () => {
+            const STORAGE_KEY = 'bunun_calendar_v3_local'; 
+            const [days, setDays] = useState(() => {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                return saved ? JSON.parse(saved) : [
+                    { id: 'mon', label: '週一', image: null, desc: '' },
+                    { id: 'tue', label: '週二', image: null, desc: '' },
+                    { id: 'wed', label: '週三', image: null, desc: '' },
+                    { id: 'thu', label: '週四', image: null, desc: '' },
+                    { id: 'fri', label: '週五', image: null, desc: '' },
+                ];
+            });
+            const [studentName, setStudentName] = useState(localStorage.getItem('student_name') || '');
+            const [activeDay, setActiveDay] = useState(null);
+            const [showReference, setShowReference] = useState(false);
+            const [showExport, setShowExport] = useState(false);
+
+            useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(days)); }, [days]);
+            useEffect(() => { localStorage.setItem('student_name', studentName); }, [studentName]);
+
+            const handleSaveDay = (id, img, desc) => {
+                setDays(days.map(d => d.id === id ? { ...d, image: img, desc: desc } : d));
+            };
+
+            const resetAll = () => {
+                if(confirm('確定要清空所有畫曆重新開始嗎？')) setDays(days.map(d => ({ ...d, image: null, desc: '' })));
+            };
+
+            const handleFinish = () => {
+                if (!studentName) return alert("請先選擇你的姓名喔！");
+                setShowExport(true);
+            };
+
+            return (
+                <div className="min-h-screen pb-20 bg-[#f5efe6] select-none">
+                    {/* Header */}
+                    <header className="bg-[#3e2723] text-[#f5efe6] shadow-xl relative overflow-hidden">
+                        <div className="bunun-pattern"></div>
+                        <div className="max-w-7xl mx-auto px-4 py-6 md:py-8 relative z-10">
+                            <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
+                                <div className="text-center lg:text-left">
+                                    <h1 className="text-3xl md:text-5xl font-black tracking-wider mb-2 flex items-center justify-center lg:justify-start gap-4 text-[#f5efe6]">
+                                        <Icon size={48} className="text-[#b91c1c]"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></Icon>
+                                        小小畫曆師
+                                    </h1>
+                                    <p className="text-[#d7ccc8] text-lg font-medium">記錄你的每週大事 · 傳承布農板曆智慧</p>
+                                </div>
+                                <div className="bg-[#5d4037] p-3 rounded-xl flex flex-col md:flex-row items-center gap-3 border border-[#8d6e63] shadow-lg">
+                                    <div className="flex items-center gap-2">
+                                        <label className="font-bold text-[#d7ccc8] whitespace-nowrap">我是：</label>
+                                        <select value={studentName} onChange={(e) => setStudentName(e.target.value)} className="bg-[#3e2723] text-white border border-[#8d6e63] rounded px-3 py-2 w-40 text-center cursor-pointer appearance-none">
+                                            <option value="" disabled>請選擇姓名</option>
+                                            {STUDENT_LIST.map(n => <option key={n} value={n}>{n}</option>)}
+                                        </select>
+                                    </div>
+                                    <button onClick={handleFinish} className="flex items-center gap-2 px-5 py-2 rounded-lg font-bold transition shadow-md whitespace-nowrap bg-[#b91c1c] text-white hover:bg-[#991b1b]">
+                                        <React.Fragment><CheckCircle size={20}/> 繳交作業</React.Fragment>
+                                    </button>
+                                </div>
+                                <div className="flex gap-3">
+                                    <button onClick={() => setShowReference(true)} className="bg-[#f5efe6] text-[#5d4037] px-4 py-3 rounded-full font-bold text-lg flex items-center gap-2 shadow-lg hover:bg-white transition active:scale-95">
+                                        <Info size={24} /><span className="hidden md:inline">符號圖鑑</span>
+                                    </button>
+                                    <button onClick={resetAll} className="bg-[#5d4037] border border-[#8d6e63] text-white px-4 py-3 rounded-full font-bold flex items-center gap-2 hover:bg-[#4e342e]">
+                                        <RotateCcw size={20} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="max-w-7xl mx-auto px-4 py-8">
+                        <AncestralBoard />
+                        <div className="bg-white p-6 md:p-8 rounded-3xl shadow-lg mb-8 border-l-8 border-[#b91c1c] relative overflow-hidden">
+                            <div className="absolute right-0 top-0 opacity-10 transform translate-x-1/4 -translate-y-1/4">
+                                <svg width="200" height="200" viewBox="0 0 100 100" fill="#5d4037"><path d="M50 0 L100 100 H0 Z" /></svg>
+                            </div>
+                            <h2 className="text-2xl font-bold text-[#5d4037] mb-3">👋 嗨！小小畫曆師</h2>
+                            <p className="text-gray-700 text-lg leading-relaxed">
+                                上面是布農族祖先的畫曆。現在換你來挑戰，幫自己規劃下週的生活。完成後記得點右上角的<b>「繳交作業」</b>，把你的畫曆存下來傳給老師喔！
+                            </p>
+                        </div>
+                        <div className="relative">
+                            <div className="wood-texture p-6 md:p-10 overflow-x-auto relative mb-12 shadow-2xl">
+                                {[...Array(4)].map((_, i) => <div key={i} className={`absolute w-6 h-6 rounded-full bg-[#271c19] shadow-inner border border-[#4e342e] ${i===0?'top-4 left-4':i===1?'top-4 right-4':i===2?'bottom-4 left-4':'bottom-4 right-4'}`}></div>)}
+                                <div className="min-w-[750px] mx-auto relative py-4">
+                                    <div className="absolute top-1/2 left-10 right-10 h-3 bg-[#3e2723] rounded-full opacity-60 transform -translate-y-1/2 z-0"></div>
+                                    <div className="flex justify-around relative z-10 px-8">
+                                        {days.map(day => (
+                                            <div key={day.id} className="flex flex-col items-center group relative">
+                                                <div className="w-8 h-8 bg-[#3e2723] transform rotate-45 mb-6 shadow-lg border-2 border-[#8d6e63] flex items-center justify-center z-20">
+                                                    <div className="w-2 h-2 bg-[#d7ccc8] rounded-full"></div>
+                                                </div>
+                                                <div onClick={() => setActiveDay(day)} className={`w-32 h-44 bg-[#e8dcc5] rounded-xl border-[5px] border-[#8d6e63] shadow-xl cursor-pointer transition-all duration-300 transform hover:-translate-y-4 hover:rotate-1 hover:shadow-2xl hover:border-[#b91c1c] flex flex-col items-center justify-center relative overflow-hidden ${day.image ? 'bg-opacity-100' : 'bg-opacity-90'}`}>
+                                                    <div className="absolute top-0 inset-x-0 bg-[#5d4037] text-[#f5efe6] py-2 text-center font-bold text-lg tracking-widest">{day.label}</div>
+                                                    {day.image ? <img src={day.image} alt={day.label} className="w-full h-full object-contain p-3 mt-6" /> : <div className="text-[#a1887f] flex flex-col items-center mt-6 animate-pulse"><Pencil size={32} className="mb-2 opacity-50" /><span className="text-sm font-bold">點擊刻畫</span></div>}
+                                                </div>
+                                                <div className="mt-4 w-36 text-center h-16 flex items-start justify-center">
+                                                    {day.desc ? <div className="bg-white px-3 py-2 rounded-lg text-sm text-[#5d4037] font-bold shadow-md border border-gray-200 w-full line-clamp-2 leading-tight">{day.desc}</div> : <span className="text-[#5d4037]/40 font-bold text-sm">--</span>}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white rounded-3xl shadow-lg p-6 md:p-8">
+                            <div className="flex items-center gap-3 mb-6 border-b-2 border-[#f5efe6] pb-4">
+                                <span className="bg-[#b91c1c] text-white p-2 rounded-lg"><Save size={24}/></span>
+                                <h3 className="text-2xl font-black text-[#5d4037]">我的畫曆解碼</h3>
+                                <span className="text-sm text-gray-500 ml-auto hidden md:block">系統會自動保留你的作品在平板上喔！</span>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {days.filter(d => d.desc || d.image).length === 0 ? <div className="col-span-2 text-center py-12 bg-[#f5efe6] rounded-xl border-2 border-dashed border-[#d7ccc8]"><p className="text-[#8d6e63] text-xl font-bold mb-2">還是一片空白的木板...</p></div> : days.filter(d => d.desc || d.image).map(day => (
+                                    <div key={day.id} className="flex items-center gap-4 p-4 bg-[#fbf8f3] rounded-xl border border-[#ece0d1] shadow-sm">
+                                        <div className="w-20 h-20 bg-[#e8dcc5] rounded-lg border-2 border-[#d7ccc8] flex-shrink-0 overflow-hidden shadow-inner">{day.image ? <img src={day.image} className="w-full h-full object-contain" /> : <span className="flex items-center justify-center h-full text-gray-300">無</span>}</div>
+                                        <div className="flex-1"><div className="flex justify-between items-center mb-1"><span className="font-black text-lg text-[#5d4037]">{day.label}</span><span className="text-xs text-[#b91c1c] bg-[#fee2e2] px-2 py-0.5 rounded-full font-bold">重要事項</span></div><p className="text-gray-800 font-medium text-lg leading-snug">{day.desc || "尚未填寫意義"}</p></div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </main>
+
+                    {activeDay && <DrawingCanvas currentDay={activeDay} existingImage={activeDay.image} existingDesc={activeDay.desc} onClose={() => setActiveDay(null)} onSave={handleSaveDay} />}
+                    
+                    {showReference && (
+                        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4" onClick={() => setShowReference(false)}>
+                            <div className="bg-[#fdfbf7] rounded-2xl max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col shadow-2xl" onClick={e => e.stopPropagation()}>
+                                <div className="bg-[#3e2723] p-4 flex justify-between items-center shrink-0">
+                                    <h3 className="text-2xl font-bold text-white flex items-center gap-3"><Info size={28} className="text-[#e8dcc5]" /> 布農族畫曆符號圖鑑</h3>
+                                    <button onClick={() => setShowReference(false)} className="text-white hover:bg-white/20 p-2 rounded-full transition"><X size={28}/></button>
+                                </div>
+                                <div className="p-6 overflow-y-auto custom-scrollbar">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                        {BUNUN_SYMBOLS.map((item, idx) => (
+                                            <div key={idx} className="border-2 border-[#d7ccc8] rounded-xl p-4 flex flex-col items-center text-center bg-white hover:border-[#8b5e3c] transition shadow-sm hover:shadow-md group">
+                                                <div className="w-20 h-20 mb-3 flex items-center justify-center bg-[#f5efe6] rounded-full group-hover:bg-[#e8dcc5] transition"><SymbolIcon type={item.type} /></div>
+                                                <div className="font-black text-lg text-[#5d4037] mb-1">{item.name}</div>
+                                                <div className="text-sm text-gray-600 leading-snug">{item.meaning}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="p-4 border-t bg-gray-50 text-center shrink-0">
+                                    <button onClick={() => setShowReference(false)} className="bg-[#5d4037] text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#3e2723] shadow-lg">我學會了，開始創作！</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {showExport && <ExportModal studentName={studentName} days={days} onClose={() => setShowExport(false)} />}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
